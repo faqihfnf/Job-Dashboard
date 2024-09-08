@@ -1,17 +1,20 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import React, { FC } from "react";
 import { RiHome4Line, RiMessage3Line, RiBuilding4Line, RiFileUserLine, RiCalendarScheduleLine, RiSettings5Line, RiLogoutBoxLine } from "react-icons/ri";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
+import { useRouter } from "next/navigation";
 interface SidebarProps {}
 
 const Sidebar: FC<SidebarProps> = ({}) => {
+  const router = useRouter();
   return (
     <div className="pb-12 min-h-screen">
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-2xl font-semibold">Dashboard</h2>
           <div className="space-y-3">
-            <Button variant={"ghost"} className="w-full justify-start rounded hover:text-indigo-600 text-lg">
+            <Button variant={"ghost"} className="w-full justify-start rounded hover:text-indigo-600 text-lg" onClick={() => router.push("/")}>
               <RiHome4Line className="mr-2 text-xl" />
               Home
             </Button>
@@ -27,7 +30,7 @@ const Sidebar: FC<SidebarProps> = ({}) => {
               <RiFileUserLine className="mr-2 text-xl" />
               All Aplicants
             </Button>
-            <Button variant={"ghost"} className="w-full justify-start rounded hover:text-indigo-600 text-lg">
+            <Button variant={"ghost"} className="w-full justify-start rounded hover:text-indigo-600 text-lg" onClick={() => router.push("/job-listings")}>
               <HiOutlineClipboardDocumentList className="mr-2 text-xl" />
               Job Listing
             </Button>
