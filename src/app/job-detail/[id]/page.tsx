@@ -3,9 +3,10 @@ import React, { FC } from "react";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Applicants from "@/components/organisms/Applicants";
+import JobDetail from "@/components/organisms/JobDetail";
 
-interface JobDetailProps {}
-const JobDetail: FC<JobDetailProps> = ({}) => {
+interface JobDetailPageProps {}
+const JobDetailPage: FC<JobDetailPageProps> = ({}) => {
   return (
     <div>
       <div className="inline-flex items-center gap-3 mb-5">
@@ -27,9 +28,11 @@ const JobDetail: FC<JobDetailProps> = ({}) => {
         <TabsContent value="applicants">
           <Applicants />
         </TabsContent>
-        <TabsContent value="jobDetails">Change your password here.</TabsContent>
+        <TabsContent value="jobDetails">
+          <JobDetail />
+        </TabsContent>
       </Tabs>
     </div>
   );
 };
-export default JobDetail;
+export default JobDetailPage;
