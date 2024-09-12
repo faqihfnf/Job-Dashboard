@@ -44,7 +44,7 @@ const Sidebar: FC<SidebarProps> = ({}) => {
           <div className="px-3 py-2">
             <h2 className="mb-2 px-4 text-2xl font-semibold">Settings</h2>
             <div className="space-y-3">
-              <Button variant={"ghost"} className="w-full justify-start rounded hover:text-indigo-600  text-lg">
+              <Button variant={"ghost"} className="w-full justify-start rounded hover:text-indigo-600  text-lg" onClick={() => router.push("/settings")}>
                 <RiSettings5Line className="mr-2 text-xl" />
                 Settings
               </Button>
