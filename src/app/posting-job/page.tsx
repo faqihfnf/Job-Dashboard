@@ -156,7 +156,7 @@ const PostJobPage: FC<PostJobPageProps> = ({}) => {
 
           {/*//? Form Required Sklills Start */}
           <FieldInput title="Required Skills" subtitle="Add required skills for the job">
-            <InputSkills form={form} />
+            <InputSkills form={form} name="requiredSkills" label="Add Skill" />
           </FieldInput>
           {/*//? Form Required Sklills End */}
 
@@ -182,7 +182,7 @@ const PostJobPage: FC<PostJobPageProps> = ({}) => {
           {/*//! Form Benefits End */}
 
           <div className="flex justify-end">
-            <Button className="bg-emerald-500 hover:bg-emerald-600" size={"lg"}>
+            <Button className="bg-emerald-600 hover:bg-emerald-500" size={"lg"}>
               Review Job
             </Button>
           </div>
