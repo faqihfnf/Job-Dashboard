@@ -12,7 +12,13 @@ import FieldInput from "@/components/organisms/FieldInput";
 import CustomUpload from "@/components/organisms/CustomUpload";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LOCATION_OPTIONS, optionType } from "@/constant";
+import { EMPLOYEE_OPTIONS, LOCATION_OPTIONS, optionType } from "@/constant";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
 
 interface OverviewFormProps {}
 
@@ -44,6 +50,7 @@ const OverviewForm: FC<OverviewFormProps> = ({}) => {
                 control={form.control}
                 name="name"
                 render={({ field }) => (
+                  // @ Company Name
                   <FormItem>
                     <FormLabel>Company Name</FormLabel>
                     <FormControl>
@@ -58,6 +65,7 @@ const OverviewForm: FC<OverviewFormProps> = ({}) => {
                 control={form.control}
                 name="name"
                 render={({ field }) => (
+                  // @ Website
                   <FormItem>
                     <FormLabel>Website</FormLabel>
                     <FormControl>
@@ -72,6 +80,7 @@ const OverviewForm: FC<OverviewFormProps> = ({}) => {
                 control={form.control}
                 name="location"
                 render={({ field }) => (
+                  // @ Location
                   <FormItem>
                     <FormLabel>Location</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -88,6 +97,80 @@ const OverviewForm: FC<OverviewFormProps> = ({}) => {
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="w-[450px] grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Employee</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Employee" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {EMPLOYEE_OPTIONS.map((item: optionType, i: number) => (
+                            <SelectItem key={item.id + 1} value={item.id}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Industry</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Industry" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {LOCATION_OPTIONS.map((item: optionType, i: number) => (
+                            <SelectItem key={item.id + 1} value={item.id}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={form.control}
+                name="dateFounded"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date Founded</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button variant={"outline"} className={cn("w-[450px] pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
