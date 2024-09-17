@@ -4,6 +4,7 @@ import React, { FC } from "react";
 import { RiHome4Line, RiMessage3Line, RiBuilding4Line, RiFileUserLine, RiCalendarScheduleLine, RiSettings5Line, RiLogoutBoxLine } from "react-icons/ri";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 interface SidebarProps {}
 
 const Sidebar: FC<SidebarProps> = ({}) => {
@@ -48,7 +49,7 @@ const Sidebar: FC<SidebarProps> = ({}) => {
                 <RiSettings5Line className="mr-2 text-xl" />
                 Settings
               </Button>
-              <Button variant={"ghost"} className="w-full text-red-600 justify-start rounded hover:text-white hover:bg-red-600 text-lg">
+              <Button variant={"ghost"} className="w-full text-red-600 justify-start rounded hover:text-white hover:bg-red-600 text-lg" onClick={() => signOut()}>
                 <RiLogoutBoxLine className="mr-2 text-xl" />
                 Logout
               </Button>
