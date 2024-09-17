@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signInFormSchema } from "@/lib/form-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,6 +40,7 @@ const SignInPage: FC<SignInPageProps> = ({}) => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input placeholder="enter your email" type="email" {...field} />
                     </FormControl>
@@ -52,6 +53,7 @@ const SignInPage: FC<SignInPageProps> = ({}) => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input placeholder="enter your password" type="password" {...field} />
                     </FormControl>
