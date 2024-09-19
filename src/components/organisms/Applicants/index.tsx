@@ -3,12 +3,14 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { JOB_APPLICANTS_COLUMNS, JOB_APPLICANTS_DATA } from "@/constant";
 import { Badge } from "@/components/ui/badge";
 import ButtonActionTable from "../ButtonActionTable";
+import { Applicant } from "@prisma/client";
 
-interface ApplicantsProps {}
-const Applicants: FC<ApplicantsProps> = ({}) => {
+interface ApplicantsProps {
+  applicants: any;
+}
+const Applicants: FC<ApplicantsProps> = ({ applicants }) => {
   return (
     <Table>
-      <TableCaption>A list of your recent applicants.</TableCaption>
       <TableHeader>
         <TableRow>
           {JOB_APPLICANTS_COLUMNS.map((item: string, i: number) => (
@@ -18,15 +20,18 @@ const Applicants: FC<ApplicantsProps> = ({}) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {JOB_APPLICANTS_DATA.map((item: any, i: number) => (
-          <TableRow key={item.name + i}>
-            <TableCell>{item.name}</TableCell>
-            <TableCell>{item.appliedDate}</TableCell>
-            <TableCell>
-              <ButtonActionTable url="" />
-            </TableCell>
-          </TableRow>
-        ))}
+        {applicants && (
+          <>
+            {applicants.map((item: any, i: number) => (
+              <TableRow key={item.id + i}>
+                <TableCell>{item.user.name}</TableCell>
+                <TableCell>
+                  <ButtonActionTable url="" />
+                </TableCell>
+              </TableRow>
+            ))}
+          </>
+        )}
       </TableBody>
     </Table>
   );

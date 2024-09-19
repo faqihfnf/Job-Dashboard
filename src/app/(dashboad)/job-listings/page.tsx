@@ -24,7 +24,6 @@ async function getDatajobs() {
 
 const JobListings: FC<JobListingsProps> = async ({}) => {
   const jobs = await getDatajobs();
-  console.log(jobs);
 
   return (
     <div>
@@ -54,7 +53,7 @@ const JobListings: FC<JobListingsProps> = async ({}) => {
                   {item.applicants} / {item.needs}
                 </TableCell>
                 <TableCell>
-                  <ButtonActionTable url="/job-detail/1" />
+                  <ButtonActionTable url={`/job-detail/${item.id}`} />
                 </TableCell>
               </TableRow>
             ))}

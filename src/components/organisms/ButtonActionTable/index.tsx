@@ -11,7 +11,7 @@ interface ButtonActionTableProps {
 const ButtonActionTable: FC<ButtonActionTableProps> = ({ url }) => {
   const router = useRouter();
   return (
-    <Button onClick={() => router.push("/job-detail/1")} size="icon" variant={"ghost"}>
+    <Button onClick={() => router.push(url)} size="icon" variant={"ghost"}>
       <HiDotsVertical className="h-4 w-4" />
     </Button>
   );
