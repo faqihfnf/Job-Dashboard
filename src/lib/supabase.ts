@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
 // Create a single supabase client for interacting with your database
-export const supabaseClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!!, process.env.NEXT_PUBLIC_SUPABASE_KEY!!);
+export const supabaseClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!!, process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_KEY!!);
 
 const createId = (length: number) => {
   let result = "";
@@ -27,12 +27,14 @@ export const supabaseUploadFile = async (file: File | string, bucket: "company" 
 };
 
 export const supabaseGetPublicUrl = (filename: string | string, bucket: "company" | "applicant") => {
-  const { data } = supabaseClient.storage.from(bucket).getPublicUrl("folder/" + filename);
-  return data.publicUrl;
+  const { data } = supabaseClient.storage.from(bucket).getPublicUrl("public/" + filename);
+  return {
+    publicUrl: data.publicUrl,
+  };
 };
 
 export const supabaseDeleteFile = async (filename: string | string, bucket: "company" | "applicant") => {
-  const { data, error } = await supabaseClient.storage.from(bucket).remove(["folder/" + filename]);
+  const { data, error } = await supabaseClient.storage.from(bucket).remove(["public/" + filename]);
   return { data, error };
 };
 
