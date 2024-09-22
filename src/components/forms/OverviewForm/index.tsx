@@ -23,6 +23,10 @@ import InputSkills from "@/components/organisms/InputSkills";
 import CKEditor from "@/components/organisms/CKEditor";
 import useSWR from "swr";
 import { Companyoverview, Industry } from "@prisma/client";
+import { supabaseUploadFile } from "@/lib/supabase";
+import { useSession } from "next-auth/react";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface OverviewFormProps {
   detail: Companyoverview | undefined;
@@ -30,9 +34,10 @@ interface OverviewFormProps {
 
 const OverviewForm: FC<OverviewFormProps> = ({ detail }) => {
   const [editorLoaded, setEditorLoaded] = useState<boolean>(false);
-
+  const { data: session } = useSession();
+  const { toast } = useToast();
+  const router = useRouter();
   const { data } = useSWR<Industry[]>("/api/company/industry", fetcher);
-
   const form = useForm<z.infer<typeof everviewFormSchema>>({
     resolver: zodResolver(everviewFormSchema),
     defaultValues: {
@@ -48,13 +53,52 @@ const OverviewForm: FC<OverviewFormProps> = ({ detail }) => {
     },
   });
 
-  const onSubmit = (val: z.infer<typeof everviewFormSchema>) => {
-    console.log(val);
+  const onSubmit = async (val: z.infer<typeof everviewFormSchema>) => {
+    try {
+      let filename = "";
+      console.log(val);
+
+      if (typeof val.image === "object") {
+        const uploadImg = await supabaseUploadFile(val.image, "company");
+        filename = uploadImg.filename;
+      } else {
+        filename = val.image;
+      }
+      const body = {
+        ...val,
+        image: filename,
+        companyId: session?.user.id,
+      };
+      console.log(body);
+
+      await fetch("/api/company/overview", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      toast({
+        title: "Success",
+        description: "Update company overview success",
+        variant: "success",
+      });
+
+      router.refresh();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Please try again!",
+        variant: "destructive",
+      });
+      console.log(error);
+    }
   };
 
   useEffect(() => {
     setEditorLoaded(true);
-  });
+  }, []);
 
   return (
     <div>
@@ -88,7 +132,7 @@ const OverviewForm: FC<OverviewFormProps> = ({ detail }) => {
 
               <FormField
                 control={form.control}
-                name="name"
+                name="website"
                 render={({ field }) => (
                   // @ Website
                   <FormItem>
@@ -166,7 +210,7 @@ const OverviewForm: FC<OverviewFormProps> = ({ detail }) => {
                         </FormControl>
                         <SelectContent>
                           {data?.map((item: Industry) => (
-                            <SelectItem key={item.id + 1} value={item.id}>
+                            <SelectItem key={item.id} value={item.id}>
                               {item.name}
                             </SelectItem>
                           ))}
@@ -210,7 +254,6 @@ const OverviewForm: FC<OverviewFormProps> = ({ detail }) => {
           </FieldInput>
           <div className="flex justify-end">
             <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500">
-              {" "}
               Save Changes
             </Button>
           </div>

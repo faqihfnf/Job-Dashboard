@@ -7,33 +7,37 @@ const createId = (length: number) => {
   let result = "";
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
+  let counter = 0;
+  while (counter < length) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
   }
   return result;
 };
 
 export const supabaseUploadFile = async (file: File | string, bucket: "company" | "applicant") => {
-  const fileName = `${createId(8)}.jpg`;
-  const { data, error } = await supabaseClient.storage.from(bucket).upload("public/" + fileName, file, {
+  const filename = `${createId(8)}.jpg`;
+
+  const { data, error } = await supabaseClient.storage.from(bucket).upload("public/" + filename, file, {
     cacheControl: "3600",
     upsert: false,
   });
+
   return {
     data,
     error,
-    fileName,
+    filename,
   };
 };
 
-export const supabaseGetPublicUrl = (filename: string | string, bucket: "company" | "applicant") => {
+export const supabaseGetPublicUrl = (filename: string, bucket: "company" | "applicant") => {
   const { data } = supabaseClient.storage.from(bucket).getPublicUrl("public/" + filename);
   return {
     publicUrl: data.publicUrl,
   };
 };
 
-export const supabaseDeleteFile = async (filename: string | string, bucket: "company" | "applicant") => {
+export const supabaseDeleteFile = async (filename: string, bucket: "company" | "applicant") => {
   const { data, error } = await supabaseClient.storage.from(bucket).remove(["public/" + filename]);
   return { data, error };
 };

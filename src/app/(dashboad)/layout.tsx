@@ -7,6 +7,7 @@ import NextAuthProvider from "@/context/NextAuthProvider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import { Toaster } from "@/components/ui/toaster";
 
 const epilogue = Epilogue({ subsets: ["latin"] });
 
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </div>
             </div>
           </NextAuthProvider>
+          <Toaster />
         </main>
       </body>
     </html>

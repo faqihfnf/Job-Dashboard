@@ -4,7 +4,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { jobFormSchema } from "@/lib/form-schema";
 import { TiPlus } from "react-icons/ti";
-import { FC, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
@@ -40,6 +40,14 @@ const InputSkills: FC<InputSkillsProps> = ({ form, name, label }) => {
     form.setValue(name, skills);
   };
 
+  useEffect(() => {
+    const val = form.getValues(name);
+
+    if (val && val.length > 0) {
+      setValues(val);
+    }
+  }, [form, name]);
+
   return (
     <FormField
       control={form.control}
@@ -51,7 +59,7 @@ const InputSkills: FC<InputSkillsProps> = ({ form, name, label }) => {
             <>
               <Button type="button" variant="outline" className="mb-2" onClick={() => setHide(!isHide)}>
                 <TiPlus className="mr-2 text-xl mb-1" />
-                Add Skills
+                {label}
               </Button>
               {isHide && (
                 <div className="my-4 flex flex-row gap-4">

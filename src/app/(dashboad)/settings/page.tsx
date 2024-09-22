@@ -24,7 +24,6 @@ async function getDetailCompany() {
 
 const SettingsPage: FC<SettingsPageProps> = async ({}) => {
   const company = await getDetailCompany();
-  console.log(company);
 
   return (
     <div>
