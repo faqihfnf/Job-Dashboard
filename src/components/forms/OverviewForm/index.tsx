@@ -1,6 +1,6 @@
 "use client";
 
-import { everviewFormSchema } from "@/lib/form-schema";
+import { overviewFormSchema } from "@/lib/form-schema";
 import React, { FC, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -31,15 +31,14 @@ import { useRouter } from "next/navigation";
 interface OverviewFormProps {
   detail: Companyoverview | undefined;
 }
-
 const OverviewForm: FC<OverviewFormProps> = ({ detail }) => {
   const [editorLoaded, setEditorLoaded] = useState<boolean>(false);
   const { data: session } = useSession();
   const { toast } = useToast();
   const router = useRouter();
   const { data } = useSWR<Industry[]>("/api/company/industry", fetcher);
-  const form = useForm<z.infer<typeof everviewFormSchema>>({
-    resolver: zodResolver(everviewFormSchema),
+  const form = useForm<z.infer<typeof overviewFormSchema>>({
+    resolver: zodResolver(overviewFormSchema),
     defaultValues: {
       dateFounded: detail?.dateFounded,
       description: detail?.description,
@@ -53,31 +52,45 @@ const OverviewForm: FC<OverviewFormProps> = ({ detail }) => {
     },
   });
 
-  const onSubmit = async (val: z.infer<typeof everviewFormSchema>) => {
+  const onSubmit = async (val: z.infer<typeof overviewFormSchema>) => {
     try {
       let filename = "";
       console.log(val);
 
       if (typeof val.image === "object") {
         const uploadImg = await supabaseUploadFile(val.image, "company");
+        console.log(uploadImg);
+
         filename = uploadImg.filename;
       } else {
         filename = val.image;
       }
+      console.log(val);
+
       const body = {
         ...val,
         image: filename,
         companyId: session?.user.id,
       };
       console.log(body);
+      console.log(val.image);
 
-      await fetch("/api/company/overview", {
+      const response = await fetch("/api/company/overview", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
       });
+
+      if (!response.ok) {
+        // Tangani jika respons gagal
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      // Tangkap respons dalam bentuk JSON
+      const data = await response.json();
+      console.log("Response Data:", data);
 
       toast({
         title: "Success",

@@ -4,8 +4,11 @@ import FieldInput from "@/components/organisms/FieldInput";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { socialMediaFormSchema } from "@/lib/form-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import React, { FC } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -17,8 +20,37 @@ const SocialMediaForm: FC<SocialMediaFormProps> = ({}) => {
     resolver: zodResolver(socialMediaFormSchema),
   });
 
-  const onSubmit = (val: z.infer<typeof socialMediaFormSchema>) => {
-    console.log(val);
+  const { data: session } = useSession();
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const onSubmit = async (val: z.infer<typeof socialMediaFormSchema>) => {
+    try {
+      const body = {
+        ...val,
+        companyId: session?.user.id,
+      };
+      await fetch("/api/company/social-media", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      await router.refresh();
+      toast({
+        title: "Success",
+        description: "Successfully added social media",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add social media",
+        variant: "destructive",
+      });
+      console.log(error);
+    }
   };
 
   return (

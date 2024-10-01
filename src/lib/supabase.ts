@@ -16,7 +16,7 @@ const createId = (length: number) => {
 };
 
 export const supabaseUploadFile = async (file: File | string, bucket: "company" | "applicant") => {
-  const filename = `${createId(8)}.jpg`;
+  const filename = `${createId(6)}.jpg`;
 
   const { data, error } = await supabaseClient.storage.from(bucket).upload("public/" + filename, file, {
     cacheControl: "3600",
@@ -32,6 +32,7 @@ export const supabaseUploadFile = async (file: File | string, bucket: "company" 
 
 export const supabaseGetPublicUrl = (filename: string, bucket: "company" | "applicant") => {
   const { data } = supabaseClient.storage.from(bucket).getPublicUrl("public/" + filename);
+
   return {
     publicUrl: data.publicUrl,
   };
@@ -39,7 +40,11 @@ export const supabaseGetPublicUrl = (filename: string, bucket: "company" | "appl
 
 export const supabaseDeleteFile = async (filename: string, bucket: "company" | "applicant") => {
   const { data, error } = await supabaseClient.storage.from(bucket).remove(["public/" + filename]);
-  return { data, error };
+
+  return {
+    data,
+    error,
+  };
 };
 
 export const supabaseUpdateFile = async (file: File | string, filename: string, bucket: "company" | "applicant") => {
@@ -47,5 +52,9 @@ export const supabaseUpdateFile = async (file: File | string, filename: string, 
     cacheControl: "3600",
     upsert: true,
   });
-  return { data, error };
+
+  return {
+    data,
+    error,
+  };
 };
