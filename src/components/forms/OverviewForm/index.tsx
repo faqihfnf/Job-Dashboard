@@ -7,13 +7,30 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TitleForm from "@/components/atoms/TitleForm";
 import { Separator } from "@/components/ui/separator";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import FieldInput from "@/components/organisms/FieldInput";
 import CustomUpload from "@/components/organisms/CustomUpload";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { EMPLOYEE_OPTIONS, LOCATION_OPTIONS, optionType } from "@/constant";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { CalendarIcon, FileArchive } from "lucide-react";
@@ -29,250 +46,315 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
 interface OverviewFormProps {
-  detail: Companyoverview | undefined;
+	detail: Companyoverview | undefined;
 }
 const OverviewForm: FC<OverviewFormProps> = ({ detail }) => {
-  const [editorLoaded, setEditorLoaded] = useState<boolean>(false);
-  const { data: session } = useSession();
-  const { toast } = useToast();
-  const router = useRouter();
-  const { data } = useSWR<Industry[]>("/api/company/industry", fetcher);
-  const form = useForm<z.infer<typeof overviewFormSchema>>({
-    resolver: zodResolver(overviewFormSchema),
-    defaultValues: {
-      dateFounded: detail?.dateFounded,
-      description: detail?.description,
-      employee: detail?.employee,
-      image: detail?.image,
-      industry: detail?.industry,
-      location: detail?.location,
-      name: detail?.name,
-      techStack: detail?.techStack,
-      website: detail?.website,
-    },
-  });
+	const [editorLoaded, setEditorLoaded] = useState<boolean>(false);
+	const { data: session } = useSession();
+	const { toast } = useToast();
+	const router = useRouter();
+	const { data } = useSWR<Industry[]>("/api/company/industry", fetcher);
+	const form = useForm<z.infer<typeof overviewFormSchema>>({
+		resolver: zodResolver(overviewFormSchema),
+		defaultValues: {
+			dateFounded: detail?.dateFounded,
+			description: detail?.description,
+			employee: detail?.employee,
+			image: detail?.image,
+			industry: detail?.industry,
+			location: detail?.location,
+			name: detail?.name,
+			techStack: detail?.techStack,
+			website: detail?.website,
+		},
+	});
 
-  const onSubmit = async (val: z.infer<typeof overviewFormSchema>) => {
-    try {
-      let filename = "";
-      console.log(val);
+	console.log(form.formState.errors);
 
-      if (typeof val.image === "object") {
-        const uploadImg = await supabaseUploadFile(val.image, "company");
-        console.log(uploadImg);
+	const onSubmit = async (val: z.infer<typeof overviewFormSchema>) => {
+		try {
+			let filename = "";
 
-        filename = uploadImg.filename;
-      } else {
-        filename = val.image;
-      }
-      console.log(val);
+			if (typeof val.image === "object") {
+				const uploadImg = await supabaseUploadFile(val.image, "company");
+				console.log(uploadImg);
 
-      const body = {
-        ...val,
-        image: filename,
-        companyId: session?.user.id,
-      };
-      console.log(body);
-      console.log(val.image);
+				filename = uploadImg.filename;
+			} else {
+				filename = val.image;
+			}
+			console.log(val);
 
-      const response = await fetch("/api/company/overview", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
+			const body = {
+				...val,
+				image: filename,
+				companyId: session?.user.id,
+			};
 
-      if (!response.ok) {
-        // Tangani jika respons gagal
-        throw new Error(`Error: ${response.statusText}`);
-      }
+			const response = await fetch("/api/company/overview", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(body),
+			});
 
-      // Tangkap respons dalam bentuk JSON
-      const data = await response.json();
-      console.log("Response Data:", data);
+			console.log(response);
 
-      toast({
-        title: "Success",
-        description: "Update company overview success",
-        variant: "success",
-      });
+			if (!response.ok) {
+				// Tangani jika respons gagal
+				throw new Error(`Error: ${response.statusText}`);
+			}
 
-      router.refresh();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Please try again!",
-        variant: "destructive",
-      });
-      console.log(error);
-    }
-  };
+			// Tangkap respons dalam bentuk JSON
+			const data = await response.json();
+			console.log("Response Data:", data);
 
-  useEffect(() => {
-    setEditorLoaded(true);
-  }, []);
+			toast({
+				title: "Success",
+				description: "Update company overview success",
+				variant: "success",
+			});
 
-  return (
-    <div>
-      <div className="my-5">
-        <TitleForm title="Basic Information" subtitle="This is company information that you can update anytime" />
-      </div>
-      <Separator className="my-5" />
+			router.refresh();
+		} catch (error) {
+			toast({
+				title: "Error",
+				description: "Please try again!",
+				variant: "destructive",
+			});
+			console.log(error);
+		}
+	};
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-8 pt-6">
-          <FieldInput title="Company Logo" subtitle="This image will be displayed in the job listing">
-            <CustomUpload form={form} name="image" />
-          </FieldInput>
+	useEffect(() => {
+		setEditorLoaded(true);
+	}, []);
 
-          <FieldInput title="Company Details" subtitle="Introduce your company core info quickly to users by fill up company details">
-            <div className="space-y-5">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  // @ Company Name
-                  <FormItem>
-                    <FormLabel>Company Name</FormLabel>
-                    <FormControl>
-                      <Input className="w-[450px]" placeholder="PT. ABC, Tbk" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+	return (
+		<div>
+			<div className="my-5">
+				<TitleForm
+					title="Basic Information"
+					subtitle="This is company information that you can update anytime"
+				/>
+			</div>
+			<Separator className="my-5" />
 
-              <FormField
-                control={form.control}
-                name="website"
-                render={({ field }) => (
-                  // @ Website
-                  <FormItem>
-                    <FormLabel>Website</FormLabel>
-                    <FormControl>
-                      <Input className="w-[450px]" placeholder="www.abc.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="mt-4 space-y-8 pt-6"
+				>
+					<FieldInput
+						title="Company Logo"
+						subtitle="This image will be displayed in the job listing"
+					>
+						<CustomUpload form={form} name="image" />
+					</FieldInput>
 
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  // @ Location
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-[450px]">
-                          <SelectValue placeholder="Select your location" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {LOCATION_OPTIONS.map((item: optionType, i: number) => (
-                          <SelectItem key={item.id + 1} value={item.id}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+					<FieldInput
+						title="Company Details"
+						subtitle="Introduce your company core info quickly to users by fill up company details"
+					>
+						<div className="space-y-5">
+							<FormField
+								control={form.control}
+								name="name"
+								render={({ field }) => (
+									// @ Company Name
+									<FormItem>
+										<FormLabel>Company Name</FormLabel>
+										<FormControl>
+											<Input
+												className="w-[450px]"
+												placeholder="PT. ABC, Tbk"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-              <div className="w-[450px] grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Employee</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Employee" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {EMPLOYEE_OPTIONS.map((item: optionType, i: number) => (
-                            <SelectItem key={item.id + 1} value={item.id}>
-                              {item.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Industry</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Industry" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {data?.map((item: Industry) => (
-                            <SelectItem key={item.id} value={item.id}>
-                              {item.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={form.control}
-                name="dateFounded"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Date Founded</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button variant={"outline"} className={cn("w-[450px] pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+							<FormField
+								control={form.control}
+								name="website"
+								render={({ field }) => (
+									// @ Website
+									<FormItem>
+										<FormLabel>Website</FormLabel>
+										<FormControl>
+											<Input
+												className="w-[450px]"
+												placeholder="www.abc.com"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-              <InputSkills form={form} name="techStack" label="Add Tech Stack"></InputSkills>
-            </div>
-          </FieldInput>
+							<FormField
+								control={form.control}
+								name="location"
+								render={({ field }) => (
+									// @ Location
+									<FormItem>
+										<FormLabel>Location</FormLabel>
+										<Select
+											onValueChange={field.onChange}
+											defaultValue={field.value}
+										>
+											<FormControl>
+												<SelectTrigger className="w-[450px]">
+													<SelectValue placeholder="Select your location" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{LOCATION_OPTIONS.map((item: optionType, i: number) => (
+													<SelectItem key={item.id + 1} value={item.id}>
+														{item.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-          <FieldInput title="About Company" subtitle="Brief description for your company. URLs are hyperlinked">
-            <CKEditor form={form} name="description" editorLoaded={editorLoaded} />
-          </FieldInput>
-          <div className="flex justify-end">
-            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500">
-              Save Changes
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
-  );
+							<div className="w-[450px] grid grid-cols-2 gap-4">
+								<FormField
+									control={form.control}
+									name="employee"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Employee</FormLabel>
+											<Select
+												onValueChange={field.onChange}
+												defaultValue={field.value}
+											>
+												<FormControl>
+													<SelectTrigger>
+														<SelectValue placeholder="Employee" />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent>
+													{EMPLOYEE_OPTIONS.map(
+														(item: optionType, i: number) => (
+															<SelectItem key={item.id + 1} value={item.id}>
+																{item.label}
+															</SelectItem>
+														),
+													)}
+												</SelectContent>
+											</Select>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="industry"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Industry</FormLabel>
+											<Select
+												onValueChange={field.onChange}
+												defaultValue={field.value}
+											>
+												<FormControl>
+													<SelectTrigger>
+														<SelectValue placeholder="Industry" />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent>
+													{data?.map((item: Industry) => (
+														<SelectItem key={item.id} value={item.id}>
+															{item.name}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+							<FormField
+								control={form.control}
+								name="dateFounded"
+								render={({ field }) => (
+									<FormItem className="flex flex-col">
+										<FormLabel>Date Founded</FormLabel>
+										<Popover>
+											<PopoverTrigger asChild>
+												<FormControl>
+													<Button
+														variant={"outline"}
+														className={cn(
+															"w-[450px] pl-3 text-left font-normal",
+															!field.value && "text-muted-foreground",
+														)}
+													>
+														{field.value ? (
+															format(field.value, "PPP")
+														) : (
+															<span>Pick a date</span>
+														)}
+														<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+													</Button>
+												</FormControl>
+											</PopoverTrigger>
+											<PopoverContent className="w-auto p-0" align="start">
+												<Calendar
+													mode="single"
+													selected={field.value}
+													onSelect={field.onChange}
+													disabled={(date) =>
+														date > new Date() || date < new Date("1900-01-01")
+													}
+													initialFocus
+												/>
+											</PopoverContent>
+										</Popover>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<InputSkills
+								form={form}
+								name="techStack"
+								label="Add Tech Stack"
+							></InputSkills>
+						</div>
+					</FieldInput>
+
+					<FieldInput
+						title="About Company"
+						subtitle="Brief description for your company. URLs are hyperlinked"
+					>
+						<CKEditor
+							form={form}
+							name="description"
+							editorLoaded={editorLoaded}
+						/>
+					</FieldInput>
+					<div className="flex justify-end">
+						<Button
+							type="submit"
+							size="lg"
+							className="bg-emerald-600 hover:bg-emerald-500"
+						>
+							Save Changes
+						</Button>
+					</div>
+				</form>
+			</Form>
+		</div>
+	);
 };
 export default OverviewForm;
