@@ -7,17 +7,27 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { socialMediaFormSchema } from "@/lib/form-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CompanySocialMedia } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { FC } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-interface SocialMediaFormProps {}
+interface SocialMediaFormProps {
+  detail: CompanySocialMedia | undefined;
+}
 
-const SocialMediaForm: FC<SocialMediaFormProps> = ({}) => {
+const SocialMediaForm: FC<SocialMediaFormProps> = ({ detail }) => {
   const form = useForm<z.infer<typeof socialMediaFormSchema>>({
     resolver: zodResolver(socialMediaFormSchema),
+    defaultValues: {
+      facebook: detail?.facebook,
+      instagram: detail?.instagram,
+      twitter: detail?.twitter,
+      linkedin: detail?.linkedin,
+      youtube: detail?.youtube,
+    },
   });
 
   const { data: session } = useSession();
@@ -94,6 +104,20 @@ const SocialMediaForm: FC<SocialMediaFormProps> = ({}) => {
                   <FormLabel>linkedin</FormLabel>
                   <FormControl>
                     <Input className="w-[450px]" placeholder="http://linkedin.com/name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="twitter"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>twitter</FormLabel>
+                  <FormControl>
+                    <Input className="w-[450px]" placeholder="http://twitter.com/name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
